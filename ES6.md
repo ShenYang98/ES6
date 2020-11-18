@@ -70,7 +70,26 @@
   Names = 100; //报错
   ```
 
-  
+### 变量的解构赋值
+
+```javascript
+//数组解构
+const NAMES = ["Tom","Jerry","John","Lucy"];
+let [n1,n2,n3,n4] = NAMES;
+//对象解构
+const PERSON = {
+    name:"Tom",
+    age:5,
+    catchMouse:function(){
+        console.log("捉老鼠");
+    }
+}
+let {catchMouse} = PERSON;
+catchMouse();
+catchMouse();
+```
+
+
 
 
 
