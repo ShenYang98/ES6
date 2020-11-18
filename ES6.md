@@ -37,3 +37,40 @@
 
   
 
+### const声明常量以及特点
+
++ 1.一定要赋初始值
+
+  ```javascript
+  const A;
+  ```
+
++ 2.一般常量使用大写
+
+  ```javascript
+  const NAME = "Tom";
+  ```
+
++ 3.常量的值不能修改
+
++ 4.块级作用域
+
+  ```javascript
+  {
+  	const NAME = "Tom";
+  }
+  console.log(NAME); //报错 NAME is not defined
+  ```
+
++ 5.对于数组和对象的元素修改，不算做对常量的修改，不会报错
+
+  ```javascript
+  const NAMES = ["Tom","Jerry","John"];
+  NAMES.push("Lucy");
+  Names = 100; //报错
+  ```
+
+  
+
+
+
