@@ -263,9 +263,115 @@ let youxi = {
     }
 ```
 
+### 生成器
 
+​	生成器函数是ES6提供的一种异步编程解决方案，语法行为与传统函数完全不同
 
+```javascript
+function * gen(arg){
+    console.log(arg) //AAA
+    //yield:函数代码的分隔符
+    //代码块1
+    let one = yield 111;
+    //代码块2
+    let two = yield 222;
+	//代码块3
+    let three = yield 333;
+	//代码块4
+}
+let iterator = gen('AAA');
+iterator.next(); //执行 
+iterator.next('BBB'); //作为第一个yield语句的返回值
+iterator.next('CCC' ); //作为第二个yield语句的返回值
+iterator.next('DDD'); //作为第三个yield语句的返回值
+```
 
+### 生成器函数实例
+
+​		1s后控制台输出111,2s后控制台输出222,3s后控制台输出333
+
+* 回调地狱
+
+```javascript
+setTimeout(() => {
+      console.log(111)
+      setTimeout(() => {
+        console.log(222)
+        setTimeout(() => {
+          console.log(333)
+        }, 3000)
+      }, 2000)
+    }, 1000)
+```
+
+* 生成器函数
+
+``` javascript
+ function one() {
+      setTimeout(() => {
+        console.log(111);
+        iterator.next();
+      }, 1000)
+    }
+
+    function two() {
+      setTimeout(() => {
+        console.log(222);
+        iterator.next()
+      }, 2000)
+    }
+
+    function three() {
+      setTimeout(() => {
+        console.log(333);
+        iterator.next()
+      }, 3000)
+    }
+
+    function* gen() {
+      yield one();
+      yield two();
+      yield three();
+    }
+    let iterator = gen();
+    iterator.next();
+```
+
+### 生成器函数实例2
+
+​		模拟获取 用户数据 订单数据 商品数据
+
+``` javascript
+    function getUsers() {
+      setTimeout(() => {
+        let data = '用户数据'
+        // 第二次调用next方法了，将作为第一个yield语句的返回值
+        iterator.next(data);
+      }, 1000);
+    }
+
+    function getOrders() {
+      setTimeout(() => {
+        let data = '订单数据'
+        iterator.next(data);
+      }, 1000);
+    }
+
+    function getGoods() {
+      setTimeout(() => {
+        let data = '商品数据'
+        iterator(data);
+      }, 1000);
+    }
+
+    function* gen() {
+      let users = yield getUsers;
+      let orders = yield getOrders;
+      let goods = yield getGoods;
+    }
+    let iterator = gen();
+    iterator.next()
+```
 
 
 
