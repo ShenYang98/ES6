@@ -373,5 +373,27 @@ setTimeout(() => {
     iterator.next()
 ```
 
+### Promise
 
+​		promise是ES6引入的异步编程的新解决方案，语法上Promise是一个构造函数，用来封装异步操作并可以获取其成功或失败的结果
+
+* Promise构造函数：Promise(excutor){}
+* Promise.prototype.then方法
+* Promise.prototype.catch方法
+
+```javascript
+ const p = new Promise((resolve, reject) => {
+      setTimeout(() => {
+        let data = '数据';
+        let err = '失败';
+        // resolve(data)
+        reject(err)
+      }, 1000);
+    })
+    p.then(res => {
+      console.log(res);
+    }, err => {
+      console.log(err);
+    })
+```
 
