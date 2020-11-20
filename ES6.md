@@ -397,3 +397,280 @@ setTimeout(() => {
     })
 ```
 
+### Promise封装读取文件
+
+```javascript
+const fs = require("fs");
+fs.readFile("test.html", (err, data) => {
+  if (err) {
+    console.log(err)
+  }
+  console.log(data.toString());
+})
+
+const p = new Promise((resolve, reject) => {
+  fs.readFile("test.html", (err, data) => {
+    if (err) {
+      reject(err)
+    }
+    resolve(data);
+  })
+})
+
+p.then((res) => {
+  console.log(res.toString());
+}, (err) => {
+  console.log("读取失败");
+})
+```
+
+## AJAX
+
+### 1.AJAX的介绍
+
++ AJAX全称为Asynchronous JavaScript And XML，就是异步的JS和XML，通过AJAX可以在浏览器中向服务器发送异步请求，最大的优势：**无刷新获取数据**
++ **优点**：
+  + 可以无需刷新页面与服务器端进行通信
+  + 允许根据用户事件来更新部分页面内容
++ **缺点**：
+  + 没有浏览历史，不能回退
+  + 存在跨域问题(同源)
+  + SEO不友好
+
+### 2.HTTP协议
+
++ 请求报文
+
+```javascript
+行		POST /s?ie=utf-8 HTTP/1.1
+头		Host: atguigu.com
+		Cookie: name=guigu
+		Content-type: application/x-www-form-urlencoded
+		User-Agent: chrome 83
+空行
+体		username=admin&password=admin
+```
+
++ 响应报文
+
+```javascript
+行		HTTP/1.1 200 OK
+头		Content-Type: text/html;charset=utf-8
+		Content-length: 2048
+		Content-encoding: gzip
+空行
+体		<html>
+    		<head>
+    		</head>
+			<body>
+    			<h1>响应体</h1>
+    		</body>
+    	</html>
+
+403：没有权限，被禁止
+401：未授权
+500：内部错误
+```
+
+### 3.express
+
+```javascript
+// 1.引入express
+const express = require("express");
+
+// 2.创建应用对象
+const app = express();
+
+//3.创建路由规则
+// request是对请求报文的封装
+// response是对响应报文的封装
+app.get("/", (request, response) => {
+  // 设置响应
+  response.send("hello express")
+})
+
+//4.监听端口启动服务
+app.listen(8000, () => {
+  console.log("服务已经启动,8000端口监听中")
+})
+```
+
+### 4.AJAX准备
+
+```javascript
+// 1.引入express
+const express = require("express");
+
+// 2.创建应用对象
+const app = express();
+
+//3.创建路由规则
+// request是对请求报文的封装
+// response是对响应报文的封装
+app.get("/server", (request, response) => {
+  // 设置响应头，设置允许跨域
+  response.setHeader("Access-Control-Allow-Origin","*")
+  // 设置响应体
+  response.send("hello AJAX")
+})
+
+//4.监听端口启动服务
+app.listen(8000, () => {
+  console.log("服务已经启动,8000端口监听中")
+})
+```
+
+### 5.GET请求
+
+```javascript
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <style>
+    #result {
+      width: 200px;
+      height: 100px;
+      border: solid 1px #90b;
+    }
+  </style>
+</head>
+
+<body>
+  <button>点击发送请求</button>
+  <div id="result"></div>
+
+  <script>
+    // 获取button元素
+    const btn = document.getElementsByTagName("button")[0];
+    const result = document.getElementById("result");
+    // 绑定事件
+    btn.onclick = function () {
+      // 1.创建对象
+      const xhr = new XMLHttpRequest();
+      // 2.初始化 设置请求方法和url
+      xhr.open("GET", "http://127.0.0.1:8000/server?a=100&b=200&c=300");
+      // 3.发送
+      xhr.send();
+      // 4.事件绑定 处理服务端返回的结果
+      // readystate是xhr对象中的属性，表示状态 0,1,2,3,4
+      // 3表示部分结果返回，4表示全部结果返回
+      xhr.onreadystatechange = function () {
+        // 判断 (服务端反悔了所有的结果)
+        if (xhr.readyState === 4) {
+          // 判断响应状态码
+          // 2xx 成功
+          if (xhr.status >= 200 && xhr.status < 300) {
+            // 处理结果 包括行 头 空行 体
+            // 1.响应行
+            console.log(xhr.status); //状态码
+            console.log(xhr.statusText) //状态字符串
+            console.log(xhr.getAllResponseHeaders()) //所有响应头
+            console.log(xhr.response) //响应体
+            // 设置result的文本
+            result.innerHTML = xhr.response;
+          } else {
+
+          }
+        }
+      }
+    }
+  </script>
+</body>
+
+</html>
+```
+
+### 6.POST请求
+
+```javascript
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <style>
+    #result {
+      width: 200px;
+      height: 100px;
+      border: solid 1px #903;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="result"></div>
+  <script>
+    // 获取元素对象
+    const result = document.getElementById("result");
+    // 绑定事件
+    result.addEventListener("mouseover", function () {
+      // 1.创建对象
+      const xhr = new XMLHttpRequest();
+      // 2.初始化 设置类型和url
+      xhr.open("Post", "http://127.0.0.1:8000/server");
+      // 设置请求头信息   请求体内容的类型 参数查询字符串了类型
+      xhr.setRequestHeader("Content-T/*  */ype", "application/x-www-form-urlencoded")
+      // 也可以自定义 但是要加上一个特殊的响应头
+      xhr.setRequestHeader("name", "shenyang");
+      // 3.发送 参数查询字符串
+      xhr.send("a:100&b:200&c:300");
+      // 4.事件绑定
+      xhr.onreadystatechange = function () {
+        if (xhr.readyState === 4) {
+          if (xhr.status >= 200 && xhr.status < 300) {
+            result.innerHTML = xhr.response;
+          }
+        }
+      }
+    })
+  </script>
+</body>
+
+</html>
+```
+
+```javascript
+// 1.引入express
+const express = require("express");
+
+// 2.创建应用对象
+const app = express();
+
+//3.创建路由规则
+// request是对请求报文的封装
+// response是对响应报文的封装
+app.get("/server", (request, response) => {
+  // 设置响应头，设置允许跨域
+  response.setHeader("Access-Control-Allow-Origin", "*")
+  // 设置响应体
+  response.send("hello AJAX")
+})
+
+// 可以接收任意类型的请求：all
+app.all("/server", (request, response) => {
+  // 设置响应头，设置允许跨域
+  response.setHeader("Access-Control-Allow-Origin", "*");
+  // 响应头
+  response.setHeader("Access-Control-Allow-Headers", "*");
+  // 设置响应体
+  response.send("hello AJAX")
+})
+
+//4.监听端口启动服务
+app.listen(8000, () => {
+  console.log("服务已经启动,8000端口监听中")
+})
+```
+
+### 
+
+
+
+### Promise封装AJAX请求
+
