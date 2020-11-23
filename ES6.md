@@ -668,7 +668,217 @@ app.listen(8000, () => {
 })
 ```
 
-### 
+### JSON数据
+
+```javascript
+ <script>
+    const result = document.getElementById("result");
+    // 绑定键盘按下事件
+    window.onkeydown = function () {
+      // 发送请求
+      const xhr = new XMLHttpRequest();
+      // 设置响应体数据的类型
+      // xhr.responseType = "json";
+      // 初始化
+      xhr.open("GET", "http://127.0.0.1:8000/json-server");
+      // 发送
+      xhr.send();
+      // 事件绑定
+      xhr.onreadystatechange = function () {
+        if (xhr.readyState === 4) {
+          if (xhr.status >= 200 && xhr.status < 300) {
+            // 手动对数据转化
+            let data = JSON.parse(xhr.response);
+            result.innerHTML = data.name;
+            // 自动转换,设置响应体数据类型
+          }
+        }
+      }
+    }
+  </script>
+```
+
+```javascript
+app.all("/json-server", (request, response) => {
+  // 设置响应头，设置允许跨域
+  response.setHeader("Access-Control-Allow-Origin", "*");
+  // 响应头
+  response.setHeader("Access-Control-Allow-Headers", "*");
+  const data = {
+    name: "Tom"
+  }
+  const str = JSON.stringify(data);
+  // 设置响应体
+  response.send(str)
+})
+```
+
+### AJAX在ie浏览器中有缓存
+
+```javascript
+// 在路径后加时间戳
+xhr.open("GET","http://127.0.0.1:8000/ie?t=" + Date.now());
+```
+
+### 请求超时与网络异常
+
+```javascript
+  <script>
+    const result = document.getElementById("result")
+    result.addEventListener("click", function () {
+      const xhr = new XMLHttpRequest();
+      // 超时设置,两秒还没有请求返回 则取消
+      xhr.timeout = 2000;
+      // 超时回调
+      xhr.ontimeout = function () {
+        alert("网络异常，请稍后重试！")
+      }
+      // 网络异常回调
+      xhr.onerror = function () {
+        alert("网络异常")
+      }
+      xhr.open("Post", "http://127.0.0.1:8000/delay");
+      xhr.send();
+      xhr.onreadystatechange = function () {
+        if (xhr.readyState === 4) {
+          if (xhr.status >= 200 && xhr.status < 300) {
+            result.innerHTML = xhr.response;
+          }
+        }
+      }
+    })
+  </script>
+```
+
+```javascript
+app.all("/delay", (request, response) => {
+  // 设置响应头，设置允许跨域
+  response.setHeader("Access-Control-Allow-Origin", "*");
+  setTimeout(() => {
+    response.send("延时响应");
+  }, 3000);
+})
+```
+
+### AJAX取消请求
+
+```javascript
+  <button>点击发送</button>
+  <button>点击取消</button>
+  <script>
+    const btns = document.querySelectorAll("button");
+    let x = null;
+    btns[0].onclick = function () {
+      x = new XMLHttpRequest();
+      x.open("GET", "http://127.0.0.1:8000/delay");
+      x.send();
+    }
+
+    btns[1].onclick = function () {
+      x.abort();
+    }
+  </script>
+```
+
+### AJAX请求重复发送问题
+
+```javascript
+<body>
+  <button>点击发送</button>
+  <button>点击取消</button>
+  <script>
+    const btns = document.querySelectorAll("button");
+    let x = null;
+    // 标识变量 是否正在发送AJAX请求
+    let isSending = false;
+    btns[0].onclick = function () {
+      // 判断标识变量 如果正在发送，则取消该请求，创建一个新的请求
+      if (isSending) {
+        x.abort()
+      };
+      x = new XMLHttpRequest();
+      // 修改标识变量的值
+      isSending = true;
+      x.open("GET", "http://127.0.0.1:8000/delay");
+      x.send();
+      x.onreadystatechange = function () {
+        if (x.readyState === 4) {
+          // 修改标识变量
+          isSending = false;
+        }
+      }
+    }
+
+    btns[1].onclick = function () {
+      x.abort();
+    }
+  </script>
+```
+
+### axios发送AJAX请求
+
+```javascript
+<button>GET</button>
+  <button>POST</button>
+  <button>AJAX</button>
+  <script>
+    const btns = document.querySelectorAll("button");
+
+    btns[0].onclick = function () {
+      // GET请求
+      axios.get("http://127.0.0.1:8000/server", {
+        // url参数
+        params: {
+          id: 100,
+          vip: 7
+        },
+        // 请求头信息
+        headers: {
+          name: "Tom",
+          age: 20
+        }
+      }).then(value => {
+        console.log(value);
+      });
+    }
+  </script>
+```
+
+```javascript
+    btns[2].onclick = function () {
+      axios({
+        //请求方法
+        method: "POST",
+        // url
+        url: "/server",
+        // url参数
+        params: {
+          vip: 10,
+          level: 30
+        },
+        // 头信息
+        headers: {
+          a: 100,
+          b: 200
+        },
+        // 请求体参数
+        data: {
+          username: "admin",
+          password: "admin"
+        }
+      }).then(response => {
+        // 响应状态码
+        console.log(response.status);
+        // 响应状态字符串
+        console.log(response.statusText);
+        // 响应头信息
+        console.log(response.headers);
+        // 响应体
+        console.log(response.data);
+      })
+    }
+  </script>
+```
 
 
 
