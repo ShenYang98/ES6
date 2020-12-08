@@ -880,7 +880,224 @@ app.all("/delay", (request, response) => {
   </script>
 ```
 
+### fetch函数发送AJAX请求
 
+```javascript
+  <button>AJAX请求</button>
+  <script>
+    const btn = document.querySelector("button");
+    btn.onclick = function () {
+      fetch("http://127.0.0.1:8000/server?vip=10", {
+        // 请求方法
+        method: "POST",
+        // 请求头
+        headers: {
+          name: "Tom"
+        },
+        // 请求体
+        body: "username=admin&password=admin"
+      }).then(response => {
+        return response.text();
+        // return response.json();
+      }).then(response => {
+        console.log(response);
+      })
+    }
+  </script>
+```
 
 ### Promise封装AJAX请求
 
+```javascript
+  <script>
+    const xhr = new XMLHttpRequest();
+    const p = new Promise((resolve, reject) => {
+      xhr.open("GET", "https://api.apiopen.top/getJoke");
+      xhr.send();
+      xhr.onreadystatechange = function () {
+        if (xhr.readyState === 4) {
+          if (xhr.status >= 200 && xhr.status < 300) {
+            resolve(xhr.response);
+          } else {
+            reject(xhr.status);
+          }
+        }
+      }
+    })
+
+    p.then((res) => {
+      console.log(res);
+    }, (err) => {
+      console.log(err);
+    })
+  </script>
+```
+
+## async和await
+
+​	async和await可以让异步代码像同步代码一样
+
+### async函数
+
++ async函数的返回值为promise对象
++ promise对象的结果由async函数执行的返回值决定
+
+### await表达式
+
++ await必须写在async函数中
++ await右侧的表达式一般为promise对象
++ await返回的是promise成功的值
++ await的promise失败了，就会抛出异常，需要通过try...catch捕获处理     
+
+### async和await读取文件
+
+```javascript
+const fs = require("fs");
+
+function readWeiXue() {
+  return new Promise((resolve, reject) => {
+    fs.readFile("./为学.md", (err, data) => {
+      if (err) {
+        reject(err);
+      }
+      resolve(data);
+    })
+  })
+}
+
+function readChaYangShi() {
+  return new Promise((resolve, reject) => {
+    fs.readFile("./插秧诗.md", (err, data) => {
+      if (err) {
+        reject(err);
+      }
+      resolve(data);
+    })
+  })
+}
+
+function readGuanShu() {
+  return new Promise((resolve, reject) => {
+    fs.readFile("./观书有感.md", (err, data) => {
+      if (err) {
+        reject(err);
+      }
+      resolve(data);
+    })
+  })
+}
+
+async function main() {
+  let res1 = await readWeiXue();
+  let res2 = await readChaYangShi();
+  let res3 = await readGuanShu();
+  console.log(res1.toString());
+  console.log(res2.toString());
+  console.log(res3.toString());
+}
+
+main();
+```
+
+### async封装ajax请求
+
+```javascript
+ function sendAJAX(url) {
+      return new Promise((resolve, reject) => {
+        let x = new XMLHttpRequest();
+        x.open("get", url);
+        x.send();
+        x.onreadystatechange = function () {
+          if (x.readyState === 4) {
+            if (x.status >= 200 && x.status < 300) {
+              resolve(x.response);
+            }
+            reject(x.status)
+          }
+        }
+      })
+    }
+    // promise then 方法测试
+    // sendAJAX("https://api.apiopen.top/getJoke").then(value => {
+    //   console.log(value);
+    // },reason => {
+
+    // })
+
+    async function main() {
+      let res1 = await sendAJAX("https://api.apiopen.top/getJoke");
+      console.log(res1);
+    }
+    main();
+```
+
+### 类和对象
+
+* 在ES6中类没有变量提升，所以必须先定义类，才能通过类实例化对象
+* 类里面的共有属性和方法一定要加this使用
+* constructor里面的this指向实例化对象，方法里面的this指向这个方法的调用者
+
+### new在执行时会做四件事情
+
+* 在内存中创建一个新的空对象
+* 让this指向这个空对象
+* 执行构造函数里面的代码，给这个新对象添加属性和方法(proto)
+* 返回这个新对象(所以构造函数里面不需要return)
+
+### 构造函数
+
+* 构造函数中的属性和方法称为成员，成员可以添加
+* 实例成员就是构造函数内部通过this添加的成员，实例成员只能通过实例化的对象来访问
+* 在构造函数本身上添加的成员是静态成员，只能通过构造函数访问
+
+```javascript
+Star.sex = "男";
+console.log(Star.sex);
+console.log(ldh.sex) //不能通过对象来访问
+```
+
+### 原型
+
+#### 构造函数原型 prototype
+
+每一个构造函数都有一个prototype原型对象，指向另一个对象，默认是空对象，不变的方法直接定义到prototype对象上，所有对象的实例就可以共享这些方法
+
+#### 对象原型 __proto_ _
+
+对象都会有一个属性 _ proto_ 指向构造函数的prototype原型对象，对象可以使用构造函数prototype原型对象的属性和方法，就是因为对象有 _ proto _原型的存在
+
+* _ proto _ 对象原型和原型对象prototype是等价的
+* _ proto _对象原型的意义就在于为对象的查找机制提供一个方向，或者说是一条路线，但它是一个非标准属性，实际开发中不可以使用这个属性，它只是内部指向原型对象prototype
+
+#### construc构造函数
+
+​	对象原型和构造函数原型对象里面都有一个属性constructor属性，constructor称为构造函数，因为它指回构造函数本身
+
+​	主要用于记录该对象引用于哪个构造函数，它可以让原型对象重新指向原来的构造函数
+
+​	如果修改了原来的原型对象，给原型对象赋值的是一个对象，则必须手动的利用constructor指回原来的构造函数
+
+```javascript
+Star.prototype = {
+	constructor:Star
+}
+```
+
+### 原型链
+
+* 只要是对象就有_ proto _ 原型，指向原型对象
+* Star原型对象里面的_ proto _ 原型指向的是Object.prototype
+* Object.prototype原型对象里面的_ proto _ 原型指向为null
+
+#### JavaScript的成员查找机制
+
+* 当访问一个对象的属性(包括方法时)，首先查找这个对象本身有没有该属性
+* 如果没有就查找它的原型(也就是_ proto _指向的prototype原型对象)
+* 如果还没有就查找原型对象的原型(Object的原型对象)
+* 以此类推一直找到Object为止(null)
+
+#### 原型对象this指向
+
+* (this调用时才能确定)
+* 在构造函数中，里面this指向的是对象实例
+* 原型对象函数里面的this指向的是实例对象
