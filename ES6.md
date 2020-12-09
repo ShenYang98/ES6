@@ -1099,5 +1099,101 @@ Star.prototype = {
 #### 原型对象this指向
 
 * (this调用时才能确定)
+
 * 在构造函数中，里面this指向的是对象实例
+  <<<<<<< HEAD
+
 * 原型对象函数里面的this指向的是实例对象
+  =======
+
+* 原型对象函数里面的this指向的是实例对象
+
+### 继承
+
+​	ES6之前没有提供extends继承，可以通过构造函数+原型对象模拟实现继承，称为组合继承
+
+ * call(): 调用这个函数，并且修改函数运行时的this指向
+
+   ```javascript
+   fun.call(thisArg,arg1,arg2,...)
+   ```
+
+   thisArg: 当前调用函数this的指向对象
+
+   arg1,arg2: 传递的其他参数
+
+#### 借用构造函数继承父类型属性
+
+``` javascript
+    function Father(uname, age) {
+      this.uname = uname;
+      this.age = age;
+    }
+    Father.prototype.money = function () {
+      console.log(10000);
+    }
+
+    function Son(uname, age) {
+      // 将父类的this修改为子类的this
+      Father.call(this, uname, age);
+    }
+    // 通过赋值原型对象会将父类和子类的原型对象指向同一个地址，子类上添加特有方法后，父类也会添加
+    // Son.prototype = Father.prototype;
+    // 创建一个Father的实例，此实例可以通过__proto__访问Father原型对象的方法
+    Son.prototype = new Father();
+    // Son中的constructor指向了Father，
+    // 如果利用对象的形式修改了原型对象，需要使用constructor指向原来的构造函数
+    Son.prototype.constructor = Son;
+    Son.prototype.exam = function () {
+      console.log("考试")
+    }
+    var son = new Son("Tom", 21)
+    console.log(son);
+    console.log(Father.prototype)
+    console.log(Son.prototype.constructor)
+```
+
+### ES5新增方法
+
+#### 数组方法
+
+* forEach()：array.forEach(function(currentValue,index,arr))
+
+  currentValue:数组当前项的值
+
+  index:数组当前项的索引
+
+  arr:数组对象本身
+
+```javascript
+    let arr = [1, 2, 3, 4, 5];
+    let sum = 0;
+    arr.forEach((value, index, arr) => {
+      sum += value;
+    })
+    console.log(sum);
+```
+
+* filter()：array.filter(function(currentValue,idnex,arr))
+
+  直接返回一个数组
+
+  currentValue:数组当前项的值
+
+  index:数组当前项的索引
+
+  arr:数组对象本身
+
+```javascript
+    let arr = [1, 2, 3, 4, 5, 6];
+    let res = arr.filter((value) => {
+      return value > 2
+    })
+    console.log(res);
+```
+
+* some()：array.some(function(currentValue,index,arr))
+
+  查找数组中是否有满足条件的元素
+
+  返回值是布尔值，查找到返回true，查找不到返回false
