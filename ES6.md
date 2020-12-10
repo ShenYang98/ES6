@@ -1197,3 +1197,204 @@ Star.prototype = {
   查找数组中是否有满足条件的元素
 
   返回值是布尔值，查找到返回true，查找不到返回false
+
+#### 字符串方法
+
+* **trim()**：str.trim()
+
+  trim()方法并不影响原字符串本身，它返回的是一个新的字符串
+
+#### 对象方法
+
+* **Object.keys()**用于获取对象自身所有的属性
+
+  Object.keys(obj)
+
+  效果类似for...in
+
+  返回一个由属性名组成的数组
+
+* **Object.defineProperty()**：定义新属性或修改原有的属性
+
+  Object.defineProperty(obj,prop,descriptor)
+
+  * obj：必需。目标对象
+  * prop：必需。需定义或修改的属性的名字
+  * descriptor：必需。目标属性所拥有的特性
+
+  **descriptor说明**：以对象形式{ }书写
+
+  + value：设置属性的值 默认为undefined
+  + writable：值是否可以重写。true|false 默认为false
+  + enumerable：目标属性是否可以被枚举。true|false 默认为false
+  + configurable：目标和属性是否可以被删除或是否可以再次修改特性。true|false 默认为false
+
+  设置configurable为false后不可再修改
+
+### 函数定义方式
+
++ 自定义函数(命名函数)
+
+```javascript
+function fn(){};
+```
+
++ 函数表达式(匿名函数)
+
+```javascript
+var fun = function(){};
+```
+
++ 利用 new Function('参数1'，'参数2'，'函数体');
+
+```javascript
+var f = new Function('a','b','console.log(a + b)');
+f();
+```
+
+​	**所有的函数都是Function的实例，函数也属于对象.**
+
+​	**原型对象中存在constructor属性指回构造函数**
+
+### 函数调用方式和this指向
+
++ 普通函数									window
++ 对象的方法                               实例对象 原型对象里面的方法也指向实例对象
++ 构造函数                                  该方法所属对象
++ 绑定事件函数                          绑定事件对象
++ 定时器函数                               window
++ 立即执行函数                           window
+
+### 改变this指向
+
+#### apply方法
+
+```javascript
+fun.apply(thisArg,[argsArray])
+```
+
++ **thisArg**：在fun函数运行时指定的this值
++ **argsArray**：传递的值，必须包含在数组里面
++ 返回值就是函数的返回值，因为它就是调用函数
+
++ 可以利用apply借助数学内置对象求数组最大，最小值
+
+  ```javascript
+      let arr = [13, 21, 23, 51, 56];
+      let max = Math.max.apply(Math, arr);
+      console.log(max)
+  ```
+
+#### bind方法
+
+​	不会调用函数，但能改变函数内部this指向
+
+```javascript
+fun.bind(thisArg,arg1,arg2,...)
+```
+
++ thisArg：在fun函数运行时指定的this值
++ arg1，arg2：传递的其他参数
++ 返回由指定的this值和初始化参数改造的原函数拷贝
+
+```javascript
+    let o = {
+      name: "Tom"
+    }
+
+    function fn() {
+      console.log(this);
+    }
+
+    let f = fn.bind(o);
+    f();
+```
+
+应用：有一个按钮，当点击了之后，就禁用这个按钮，3秒钟之后开启这个按钮
+
+```javascript
+btn.onclick = function(){
+    this.disabled = true; //this指向的是btn这个按钮
+    var that = this;
+    setTimeout(function(){
+		//that.disabled = false;// 定时器函数里面的this指向的是window
+        this.disabled = false;// 定时器函数里面的this指向的是window
+    }.bind(this),3000)//这个this指向的是btn这个对象
+}
+```
+
+### call apply bind小结
+
++ 相同点：都可以改变函数内部的this指向
++ 区别点：
+  + call和apply会调用函数，并且改变函数内部this指向
+  + call和apply传递的参数不一样，call传递参数aru1，aru2...形式，apply必须数组形式[arg]
+  + bind不会调用函数，可以改变函数内部this指向
+
++ 场景
+
+  call经常做继承
+
+  apply和数组有关系，比如借助数学对象实现数组最大值最小值
+
+  bind不调用函数，但是还想改变this指向，比如改变定时器内部的this指向
+
+### 严格模式
+
++ 消除了JS语法的一些不合理、不严谨之处，减少了一些怪异行为
++ 消除代码运行的一些不安全之处，保证代码运行的安全
++ 提高编译器效率，增加运行速度
+
++ 禁用了在ECMAScript的未来版本中可能会定义的一些语法，为未来新版本的Javascript做好铺垫，比如一些保留字如：class，enum，export，import，super不能做变量名
+
+#### 变量规定
+
++ 变量必须先声明再使用
++ 严禁删除已经声明的变量，例如，delete x；语法是错误的
+
+#### this指向
+
++ 以前在全局作用域函数中的this指向window对象，严格模式下全局作用域中函数中的this是underfined
++ 以前构造函数时不加new也可以调用，当普通函数，this指向全局对象，严格模式下，如果构造函数不加new调用，this会报错
++ new实例化的构造函数指向创建的对象实例
++ 定时器this还是指向window
++ 事件、对象还是指向调用者
+
+#### 函数变化
+
++ 函数不能有重名的参数
++ 函数必须声明在顶层，不允许在非函数的代码块内声明函数
+
+### 闭包(Closure)
+
+​	闭包指有权访问另一个函数作用域中变量的函数
+
+```javascript
+function fn(){
+    var num = 10;
+    function fun(){
+        console.log(num);
+    }
+    fun();
+}
+fn();
+```
+
+#### 闭包的作用
+
++ 延伸了变量的作用范围
+
+```javascript
+function fn(){
+    var num = 10;
+    return function fun(){
+		console.log(num)
+    }
+   //return fun;
+}
+var f = fn();
+f();
+```
+
+
+
