@@ -1396,5 +1396,33 @@ var f = fn();
 f();
 ```
 
+#### 闭包案例
 
++ 循环注册点击事件
 
+```javascript
+    for (var i = 0; i < lis.length; i++) {
+      (function (i) {
+        lis[i].onclick = function () {
+          console.log(i)
+        }
+      })(i)
+    }
+```
+
++ 循环中的setTimeout()
+
+```javascript
+var lis = document.querySelector('.nav').querySelectorAll('li');
+for(var i = 0;i < lis.length;i++){
+	(function(){
+		setTimeout(function(){
+            console.log(lis[i].innerHTML)
+        },3000)
+    })(i)
+}
+```
+
++ 闭包应用-计算打车价格
+
+  打车起步价13(3公里内)，之后每多一公里增加5块钱，用户输入公里数就可以计算打车价格，如果有拥堵情况，总价格多收取10块钱拥堵费
