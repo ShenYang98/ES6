@@ -1367,7 +1367,7 @@ btn.onclick = function(){
 
 ### 闭包(Closure)
 
-​	闭包指有权访问另一个函数作用域中变量的函数
+​	闭包指有权访问另一个函数作用域中局部变量的函数
 
 ```javascript
 function fn(){
@@ -1426,3 +1426,54 @@ for(var i = 0;i < lis.length;i++){
 + 闭包应用-计算打车价格
 
   打车起步价13(3公里内)，之后每多一公里增加5块钱，用户输入公里数就可以计算打车价格，如果有拥堵情况，总价格多收取10块钱拥堵费
+
+```javascript
+	  var car = (function () {
+      var start = 13;
+      var total = 0;
+      return {
+        Car: function (n) {
+          if (n <= 3) {
+            total = start;
+          } else {
+            total = (n - 3) * 5
+          }
+        },
+        yd: function (flag) {
+          return flag ? total + 10 : total;
+        }
+      }
+    })()
+```
+
+#### 思考题
+
+```javascript
+    var name = "The window";
+    var object = {
+      name: "My Object",
+      getNameFunc: function () {
+        return function () {
+          return this.name;
+        };
+      }
+    }
+    console.log(object.getNameFunc()()) //输出The window     匿名函数中this指向window，无闭包产生，没有局部变量
+```
+
+```javascript
+    var name = "The Window";
+    var object = {
+      name: "My Object",
+      getNameFunc: function () {
+        var that = this;
+        return function () {
+          return that.name;
+        };
+      }
+    };
+    console.log(object.getNameFunc()()) //输出My Object  that指向object 有闭包，使用了getNameFunc函数的局部变量
+```
+
+#### 递归
+
