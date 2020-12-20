@@ -1477,3 +1477,104 @@ for(var i = 0;i < lis.length;i++){
 
 #### 递归
 
++ 函数内部自己调用自己
+
+```javascript
+    let num = 1;
+    function fn() {
+      console.log("打印");
+      if (num === 6) {
+        return;
+      }
+      num++;
+      fn();
+    }
+    fn();
+```
+
++ 递归求阶乘
+
+```javascript
+    function fn(n) {
+      if (n === 1) {
+        return 1;
+      }
+      return n * fn(n - 1);
+    }
+    console.log(fn(3));
+```
+
++ 递归求斐波那契数列
+
+```javascript
+    function fn(n) {
+      if (n === 1 || n === 2) {
+        return 1;
+      }
+      return fn(n - 1) + fn(n - 2);
+    }
+    console.log(fn(6))
+```
+
+#### 深拷贝和浅拷贝
+
++ 浅拷贝只是拷贝一层，更深层次对象级别的只拷贝引用
++ 深拷贝拷贝多层，每一级别的数据都会拷贝
+
++ Object.assign(target,...sources) es6新增方法可以浅拷贝
++ 浅拷贝：
+
+```javascript
+    let obj = {
+      id: 1,
+      name: "andy",
+      msg: {
+        age: 18
+      }
+    }
+    let o = {};
+    for (let k in obj) {
+      //k是属性名   obj[k]是属性值
+      o[k] = obj[k];
+    }
+    console.log(o)
+    o.msg.age = 20; //o和obj的msg指向同一个地址，修改o里面msg会改变obj
+    console.log(obj)
+
+    // es6的assign方法
+    Object.assign(o, obj);
+```
+
++ 深拷贝：
+
+```javascript
+    let obj = {
+      id: 1,
+      name: "andy",
+      msg: {
+        age: 18
+      },
+      color:["pink","red"]
+    }
+    let o = {};
+
+    function deepCopy(newobj, oldobj) {
+      for (let k in oldobj) {
+        let item = oldobj[k];
+        if (item instanceof Array) {
+          // 判断值是否属于数组
+          newobj[k] = [];
+          deepCopy(newobj[k], item)
+        } else if (item instanceof Object) {
+          // 判断值是否属于对象
+          newobj[k] = {};
+          deepCopy(newobj[k], item)
+        } else {
+          newobj[k] = item
+        }
+      }
+    }
+    deepCopy(o, obj);
+    console.log(o)
+```
+
