@@ -1578,3 +1578,23 @@ for(var i = 0;i < lis.length;i++){
     console.log(o)
 ```
 
+#### 正则表达式
+
+```javascript
+    // 1.利用RegExp对象来创建正则表达式
+    var regexp = new RegExp(/123/);
+    console.log(regexp);
+
+    // 2.利用字面量创建正则表达式
+    var rg = /123/;
+    // 3.test方法用来检测字符串是否符合正则表达式要求的规范
+    console.log(rg.test(123));
+    console.log(rg.test("abc"));
+```
+
++ *号出现0次或更多次
++ +号出现1次或更多次
++ ？号出现0次或1次
++ {3}重复3次
++ {3，}大于等于3
++ {3,16}大于等于3并且小于等于16
