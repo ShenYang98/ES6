@@ -123,7 +123,7 @@ let s = `${Tom}捉老鼠`;
 let fn = (a,b) =>{
     return a + b;
 }
-//2.this是静态的，this始终指向函数声明时所在作用域下的this的值
+//2.this是静态的，this始终指向函数声明时所在作用域下的this的值，也就是指向函数定义位置的上下文this
  function getName() {
       console.log(this.name);
     }
@@ -157,6 +157,19 @@ let fn = (a,b) =>{
     }
     //(2)当代码体只有一条语句的时候，可以省略花括号,return必须省略
     let pow = n => n*n;
+```
+
++ 面试题：
+
+```javascript
+    // var age = 100;
+    var obj = {
+      age: 20,
+      say: () => {
+        console.log(this.age) //undefined，obj是对象，没有作用域，因此箭头函数定义在全局作用域上，this指向的是window
+      }
+    }
+    obj.say();
 ```
 
 ### rest参数
