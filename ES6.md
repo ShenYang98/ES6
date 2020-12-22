@@ -4,10 +4,8 @@
 
   ```javascript
   let person = "Tom";
-  let person = "John";
+  let person = "John;
   ```
-
-  
 
 + 2.块级作用域(全局，函数，eval)
 
@@ -35,6 +33,17 @@
       }
       fn();
   }
+  ```
+
+
++ 使用let关键字声明的变量具有暂时性死区特性
+
+  ```javascript
+      var num = 10;
+      if (true) {
+        console.log(num); //报错，不会寻找外部的num
+        let num = 20;
+      }
   ```
 
   
