@@ -395,11 +395,12 @@ setTimeout(() => {
 
 ### Promise
 
-​		promise是ES6引入的异步编程的新解决方案，语法上Promise是一个构造函数，用来封装异步操作并可以获取其成功或失败的结果
+​		promise是ES6引入的异步编程的新解决方案，语法上Promise是一个构造函数，用来封装异步操作并可以获取其成功或失败的结果，**支持链式调用，可以解决回调地狱问题**
 
 * Promise构造函数：Promise(excutor){}
 * Promise.prototype.then方法
 * Promise.prototype.catch方法
+* resolve可以将promise对象的状态设置为”成功“，reject可以将promise对象的状态设置为“失败”
 
 ```javascript
  const p = new Promise((resolve, reject) => {
@@ -410,10 +411,10 @@ setTimeout(() => {
         reject(err)
       }, 1000);
     })
-    p.then(res => {
-      console.log(res);
-    }, err => {
-      console.log(err);
+    p.then(value => {
+      console.log(value);
+    }, reason => {
+      console.log(reason);
     })
 ```
 
@@ -437,9 +438,9 @@ const p = new Promise((resolve, reject) => {
   })
 })
 
-p.then((res) => {
-  console.log(res.toString());
-}, (err) => {
+p.then((value) => {
+  console.log(value.toString());
+}, (reason) => {
   console.log("读取失败");
 })
 ```
