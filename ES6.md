@@ -445,6 +445,120 @@ p.then((value) => {
 })
 ```
 
+```javascript
+function mineReadFile(path) {
+  return new Promise((resolve, reject) => {
+    require('fs').readFile(path, (err, data) => {
+      if (err) {
+        reject(err)
+      }
+      resolve(data)
+    })
+  })
+}
+
+mineReadFile("./async.js").then(value => {
+  console.log(value.toString());
+}, reason => {
+  console.log("读取失败")
+})
+```
+
+### util.promisify
+
++ 传入一个遵循常见的错误优先的回调风格的函数（即以(err,value) => ... 回调作为最后一个参数），并返回一个返回promise的版本
+
+```javascript
+const util = require("util");
+const fs = require("fs");
+
+let myReadFile = util.promisify(fs.readFile);
+myReadFile("./async.js").then(value => {
+  console.log(value);
+})
+
+```
+
+### Promise封装AJAX请求
+
+```javascript
+    const btn = document.querySelector(".btn");
+    btn.addEventListener("click", function () {
+      const xhr = new XMLHttpRequest();
+      xhr.open("GET", "https://api.apiopen.top/getJoke");
+      xhr.send();
+      xhr.onreadystatechange = function () {
+        if (xhr.readyState === 4) {
+          if (xhr.status >= 200 && xhr.status < 300) {
+            console.log(xhr.response);
+          } else {
+            console.log(xhr.status)
+          }
+        }
+      }
+    })
+```
+
+```javascript
+    function sendAJAX(url) {
+      return new Promise((resolve, reject) => {
+        const xhr = new XMLHttpRequest();
+        xhr.open("GET", url);
+        xhr.send();
+        xhr.onreadystatechange = function () {
+          if (xhr.readyState === 4) {
+            if (xhr.status >= 200 && xhr.status < 300) {
+              resolve(xhr.response);
+            } else {
+              reject(xhr.status);
+            }
+          }
+        }
+      })
+    }
+    sendAJAX('https://api.apiopen.top/getJoke').then(value => {
+      console.log(value);
+    })
+```
+
+### Promise对象状态属性介绍
+
++ 状态指的是实例对象中的一个属性[PromiseState]
++ 有三种状态：
+  + pending：未决定的 
+  + resolved / fullfilled：成功
+  + rejected：失败 
++ 只能由pending变为成功或失败，不能由成功转为失败或由失败转为成功，并且只能改变一次
+
+### Promsie对象结果值属性介绍
+
++ 实例对象中的另一个属性[PromiseResult]
++ 保存着异步任务成功/失败的结果(err,data)
+
+### Promise API
+
+#### 构造器
+
++ Promise(excutor){}：executor Promise内部立即同步调用，异步操作在执行器中执行
+
+#### Promise.prototype.catch
+
++ (onRejected) => {}：指定失败的回调函数(reason) => {}
+
+#### Promise.resolve方法：
+
++ (value) => {}
++ value：成功的数据或promise对象
++ 说明：返回一个失败的promsie对象
++ 
+
+```javascript
+let p1 = Promise.resolve();
+console.log(p1);  //
+```
+
+
+
 ## AJAX
 
 ### 1.AJAX的介绍
