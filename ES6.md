@@ -680,6 +680,66 @@ console.log(result)
 
 + promise如何串连多个操作任务
 
+  + promise的then()返回一个新的promise，可以形成then()的链式调用
+  + 通过then的链式调用串连多个同步/异步任务
+
+  ```javascript
+      let p1 = new Promise((resolve, reject) => {
+        setTimeout(() => {
+          resolve("OK");
+        }, 1000);
+      });
+      p1.then(value => {
+        return new Promise((resolve, reject) => {
+          resolve("success");
+        })
+      }).then(value => {
+        console.log(value) //输出success
+      }).then(value => {
+        console.log(value) //输出undefined，因为前一个then的返回结果不是一个promise对象
+      })
+  ```
+
++ promise异常穿透
+
+  + 当使用promise的then链式调用时，可以在最后指定失败的回调
+  + 前面任何操作出了异常，都会传到最后失败的回调中处理
+
+  ```javascript
+      let p1 = new Promise((resolve, reject) => {
+        // resolve("ok");
+        reject("err")
+      })
+      p1.then(value => {
+        console.log(111);
+      }).then(value => {
+        console.log(222);
+      }).catch(reason => {
+        console.warn(reason)
+      })
+  ```
+
++ 中断promise链
+
+  + 当时用promise的then链式调用时，在中间中断，不在调用后面的回调函数
+  + 办法：在回调函数中返回一个pendding状态的promise对象(throw或者返回一个rejected的Promise，后面then方法的回调都不会执行，返回一个pendding状态的Promise，包括catch里的回调也不会执行)
+
+  ```javascript
+      let p1 = new Promise((resolve, reject) => {
+        // resolve("ok");
+        reject("err")
+      })
+      p1.then(value => {
+        console.log(111);
+        //有且只有一个方式，返回一个pendding状态的promise对象
+        return new Promise(() => {});l
+      }).then(value => {
+        console.log(222);
+      }).catch(reason => {
+        console.warn(reason)
+      })
+  ```
+
   
 
 ## AJAX
@@ -1198,14 +1258,32 @@ app.all("/delay", (request, response) => {
 ### async函数
 
 + async函数的返回值为promise对象
+
 + promise对象的结果由async函数执行的返回值决定
+
+  + 如果返回值是一个非Promise类型的数据，结果就是一个成功的promise对象
+  + 如果返回值是一个成功的Promise对象，结果就是成功的Promise的对象
+  + 如果抛出异常，结果就是失败的Promise对象
+
+  ```javascript
+      async function main() {
+        // return 111;
+        return new Promise((resolve, reject) => {
+          // resolve("成功");
+          reject("失败")
+        })
+        // throw "err"
+      }
+      let result = main();
+      console.log(result)
+  ```
 
 ### await表达式
 
-+ await必须写在async函数中
-+ await右侧的表达式一般为promise对象
++ await必须写在async函数中，但async函数中可以没有await
++ await右侧的表达式一般为promise对象，如果是其他值，将此值作为await的返回值
 + await返回的是promise成功的值
-+ await的promise失败了，就会抛出异常，需要通过try...catch捕获处理     
++ 如果await的promise失败了，就会抛出异常，需要通过try...catch捕获处理     
 
 ### async和await读取文件
 
