@@ -550,11 +550,70 @@ myReadFile("./async.js").then(value => {
 + (value) => {}
 + value：成功的数据或promise对象
 + 说明：返回一个失败的promsie对象
-+ 
 
 ```javascript
-let p1 = Promise.resolve();
-console.log(p1);  //
+let p1 = Promise.resolve(521);
+//如果传入的参数为非promise类型的对象，则返回的结果为成功promise对象
+//如果传入的参数为Promise对象，则参数的结果决定了resolve的结果
+console.log(p1);  
+let p2 = Promise.resolve(new Promise((resolve,reject) => {
+	resolve("OK");
+   //reject("Error"); 
+}))
+//reject要有对应的回调处理，可以用catch处理
+p2.catch(reason => {
+    console.log(reason);
+})
+```
+
+#### Promise.reject方法：
+
++ (reason) => {}
++ reason:失败的原因
++ 说明：返回一个失败的promise对象
+
+```javascript
+let p = Promise.reject("521");
+let p2 = Promise.reject("John");
+let p3 = Promise.reject(new Promise((resolve, reject) => {
+      resolve("123");
+}))
+//返回的结果永远是失败的，传入的是什么，失败的结果就是什么
+console.log(p2);
+```
+
+#### Promise.all方法：
+
++ (promises) => {}
++ promises：包含n个promise的数组
++ 说明：返回一个新的promise，只有所有的promise都成功才成功，只要有一个失败了就直接失败
+
+```javascript
+let p1 = new Promise((resolve, reject) => {
+  resolve("成功")
+})
+// let p2 = Promise.resolve("OK");
+let p2 = Promise.reject("Error");
+const result = Promise.all([p1, p2]);
+console.log(result); //状态：rejected 值：Error
+```
+
+#### Promise.race方法：
+
++ (promises) => {}
++ promises包含n个promise的数组
++ 说明：返回一个新的promsie，第一个**完成**的promise的结果状态就是最终的结果状态
+
+```javascript
+let p1 = new Promise((resolve, reject) => {
+setTimeout(() => {
+    resolve("成功");
+  }, 2000);
+})
+// let p2 = Promise.resolve("OK");
+let p2 = Promise.reject("Error");
+const result = Promise.race([p1, p2]);
+console.log(result)
 ```
 
 
