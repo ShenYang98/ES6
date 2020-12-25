@@ -616,7 +616,71 @@ const result = Promise.race([p1, p2]);
 console.log(result)
 ```
 
+#### Promise的关键问题
 
++ 如何改变promise的状态
+
+  + resolve(value)：pending转为resolved
+  + reject(reason)：pending转为rejected
+  + 抛出异常：pending转为rejected
+
++ 一个promise指定多个成功/失败回调函数，都会调用吗？
+
+  + 当promise改变为对应状态时都会调用
+
+  ```javascript
+  let p = new promise((resolve,reject) => {
+  	resolve("OK");
+  })
+  p.then(value => {
+      console.log(value);
+  })
+  p.then(value => {
+      alert(value);
+  })
+  ```
+
++ 改变状态与指定回调谁先谁后
+
+  + 都有可能，正常情况下是先指定回调再改变状态，但也可以先改状态再指定回调
+  + 如果是异步任务，就是先改变状态再指定回调
+  + 如何先改状态再指定回调？
+    + 在执行器中直接调用resolve()/reject()
+    + 延迟更长时间才调用then()
+  + 什么时候才能拿到数据
+    + 如果先指定的回调(异步任务)，那当状态发生改变时，回调函数就会调用，得到数据
+    + 如果先改变的状态，那当指定回调时，回调函数就会调用，得到数据
+
++ then方法返回的promise结果由什么决定
+
+  + 简单表达：由then()指定的回调函数执行的结果决定
+
+  + 详细表达：
+
+    + 如果抛出异常，新promise变为rejected，reason为抛出的异常
+    + 如果返回的是非promise的任意值，新promise变为resolved，value为返回的值
+    + 如果返回的是另一个新promise，此promise的结果就会成为新promise的结果
+
+    ```javascript
+    let p = new Promise((resolve,reject) => {
+    	resolve("ok");
+    });
+    
+    let result = p.then(value => {
+        //console.log(value);
+        //throw "出了问题"
+        //return 123;
+        return new Promise((resolve,reject) => {
+    		resolve("success");
+        });
+    },reason =>{
+        console.warn(reason);
+    })
+    ```
+
++ promise如何串连多个操作任务
+
+  
 
 ## AJAX
 
