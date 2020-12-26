@@ -740,6 +740,49 @@ console.log(result)
       })
   ```
 
+
+#### async和await结合
+
++ 读取文件
+
+     ```javascript
+      // 回调函数
+      const fs = require("fs");
+      const util = require("util");
+      const mineReadFile = util.promisify(fs.readFile());
+      fs.readFile("1.html", (err, data1) => {
+        if (err) throw err;
+        fs.readFile("2.html", (err, data2) => {
+          if (err) throw err;
+          fs.readFile("3.html", (err, data3) => {
+            if (err) throw err;
+            console.log(data1 + data2 + data3);
+          })
+        })
+      })
+     ```
+
+  ```javascript
+      // async+await
+      async function main() {
+        try {
+          let data1 = await mineReadFile("1.html");
+          let data2 = await mineReadFile("2.html");
+          let data3 = await mineReadFile("3.html");
+          console.log(data1 + data2 + data3);
+        } catch (e) {
+          console.log(e);
+        }
+      }
+      main();
+  ```
+
++ AJAX请求
+
+  ```javascript
+  
+  ```
+
   
 
 ## AJAX
@@ -1281,9 +1324,28 @@ app.all("/delay", (request, response) => {
 ### await表达式
 
 + await必须写在async函数中，但async函数中可以没有await
+
 + await右侧的表达式一般为promise对象，如果是其他值，将此值作为await的返回值
+
 + await返回的是promise成功的值
+
 + 如果await的promise失败了，就会抛出异常，需要通过try...catch捕获处理     
+
+  ```javascript
+      async function main() {
+        let p1 = new Promise((resolve, reject) => {
+          // resolve("成功");
+          reject("失败")
+        })
+        try {
+          let res = await p1;
+        } catch (err) {
+          console.log(err);
+        }
+      }
+  
+      main();
+  ```
 
 ### async和await读取文件
 
