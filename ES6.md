@@ -790,6 +790,53 @@ console.log(result)
 
   + 每次准备取出第一个宏任务执行前，都要将所有的微任务一个一个取出来执行
 
++ 面试题：
+
+  + 1
+
+  ```javascript
+      setTimeout(() => {
+        console.log(1)
+      }, 0);
+      Promise.resolve().then(() => {
+        console.log(2)
+      })
+      Promise.resolve().then(() => {
+        console.log(4)
+      })
+      console.log(3)
+  	//3 2 4 1
+  ```
+
+  + 2
+
+  ```javascript
+      setTimeout(() => {
+        console.log(1)
+      }, 0)
+      new Promise((resolve) => {
+        console.log(2) //执行器函数是同步执行的
+        resolve()
+      }).then(() => {
+        console.log(3)
+      }).then(() => {
+        console.log(4)
+      })
+      console.log(5)
+      // 2 5 3 4 1
+      // 2执行后3的状态修改为成功，3立即放入微队列
+      // 但是在3还未执行，4的then没有放入微任务队列，因为3的回调函数没执行，4的状态没有修改
+      // 取出微队列的3后，3执行后，4的状态修改为成功，再把4放入微任务
+  ```
+
+  + 3
+
+  ```javascript
+  
+  ```
+
+  
+
 ## AJAX
 
 ### 1.AJAX的介绍
