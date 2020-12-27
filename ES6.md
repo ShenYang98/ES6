@@ -832,7 +832,72 @@ console.log(result)
   + 3
 
   ```javascript
+      const first = () => (
+        new Promise((resolve, reject) => {
+          console.log(3)
+          let p = new Promise((resolve, reject) => {
+            console.log(7);
+            setTimeout(() => {
+              console.log(5)
+              resolve(6)
+            }, 0);
+            resolve(1)
+          })
+          resolve(2)
+          p.then((arg) => {
+            console.log(arg);
+          })
+        })
+      )
+      first().then((arg) => {
+        console.log(arg);
+      })
+      console.log(4)
+      // 3 7 4 1 2 5
+      // 首先寻找同步执行，first在4之前执行，先输出3，7是执行器函数，再输出7，最后输出同步执行的4
+      // resolve(1)立即执行，p的状态被修改为成功，然后执行resolve(2),前一个Promise的状态也被修改为成功
+      // 但是p的回调先执行，将1放入微队列，然后执行first的回调，将2放入微队列
+  	// 定时器中的resolve(6)不会再打印，因为p的状态已经修改了一次，变为了成功
+  ```
+
+  + 4
+
+  ```javascript
+      setTimeout(() => {
+        console.log(0)
+      }, 0);
+      new Promise((resolve, reject) => {
+        console.log(1)
+        resolve()
+      }).then(() => {
+        console.log(2)
+        new Promise((resolve, reject) => {
+          console.log(3)
+          resolve()
+        }).then(() => {
+          console.log(4)
+        }).then(() => {
+          console.log(5)
+        }).then(() => {
+          console.log(6)
+        })
+      })
   
+      new Promise((resolve, reject) => {
+        console.log(7)
+        resolve()
+      }).then(() => {
+        console.log(8)
+      })
+      // 首先将0放入宏队列，执行器函数1同步执行，输出1，然后修改回调函数状态为成功，将2放入微队列
+      // 6的回调是立即执行的，但是上面的回调还没执行，不会放入微队列
+      // 第二个Promise先同步输出7，然后将8的回调函数修改为成功，将8放入微队列
+      // 然后输出2的回调函数，2中Promise先输出3，然后修改状态为成功，将4放入微队列，5被缓存，不会放入队列，此时4在微队列中还未执行，6的回调放入微队列
+      // 1 7 2 3 
+      // 宏：[0]
+      // 微：[8,4,6]
+      // 取出8执行，再取出4执行，此时5放入微队列
+      // 有时后面then的回调要等到之前then回调执行才能放入队列
   ```
 
   
