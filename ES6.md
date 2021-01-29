@@ -2,8 +2,6 @@
 
 + 1.变量不能重复声明
 
-+ 
-
   ```javascript
   let person = "Tom";
   let person = "John;
